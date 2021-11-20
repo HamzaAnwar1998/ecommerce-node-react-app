@@ -43,10 +43,13 @@ export const Home = (props) => {
     
     // state of products
     const [products, setProducts]=useState([]);
+    
+    // state of category
+    const [category, setCategory]=useState('Electronic Devices');
 
     // getting products function
     const getProducts = async ()=>{
-        const products = await fs.collection('Products').get();
+        const products = await fs.collection('Products').where('category','==',category).get();
         const productsArray = [];
         for (var snap of products.docs){
             var data = snap.data();
@@ -62,7 +65,7 @@ export const Home = (props) => {
 
     useEffect(()=>{
         getProducts();
-    },[])
+    },[category])
 
     // state of totalProducts
     const [totalProducts, setTotalProducts]=useState(0);
@@ -98,18 +101,50 @@ export const Home = (props) => {
         }
         
     }
+     
+    const handleCategory=(e)=>{
+        setCategory(e.currentTarget.id);
+        document.getElementById(category).classList.toggle('active');                     
+    }
     
     return (
         <>
             <Navbar user={user} totalProducts={totalProducts}/>           
             <br></br>
             {products.length > 0 && (
-                <div className='container-fluid'>
-                    <h1 className='text-center'>Products</h1>
-                    <div className='products-box'>
-                        <Products products={products} addToCart={addToCart}/>
-                    </div>
-                </div>
+                <>
+                    <div className='container-fluid filter-products-main-box'>
+                        <div className='filter-box'>
+                            <h6>Filter by category</h6>                        
+                            <span onClick={handleCategory} 
+                            id="Electronic Devices" data-id="Electronic Devices">Electronic Devices</span>
+                            <span onClick={handleCategory}
+                            id="Mobile Accessories" data-id="Mobile Accessories">Mobile Accessories</span>
+                            <span onClick={handleCategory}
+                            id="TV & Home Appliances" data-id="TV & Home Appliances">TV & Home Appliances</span>
+                            <span onClick={handleCategory}
+                            id="Sports & outdoors" data-id="Sports & outdoors">Sports & outdoors</span>
+                            <span onClick={handleCategory}
+                            id="Health & Beauty" data-id="Health & Beauty">Health & Beauty</span>
+                            <span onClick={handleCategory}
+                            id="Home & Lifestyle" data-id="Home & Lifestyle">Home & Lifestyle</span>
+                            <span onClick={handleCategory}
+                            id="Men's Fashion" data-id="Men's Fashion">Men's Fashion</span>
+                            <span onClick={handleCategory}
+                            id="Watches, bags & Jewellery" data-id="Watches, bags & Jewellery">Watches, bags & Jewellery</span>
+                            <span onClick={handleCategory}
+                            id="Groceries" data-id="Groceries">Groceries</span>
+                        </div>                 
+                      
+                        <div className='my-products'>
+                            <h1 className='text-center'>{category}</h1>
+                            <div className='products-box'>
+                                <Products products={products} addToCart={addToCart}/>
+                            </div>
+                        </div>
+
+                    </div>                    
+                </>
             )}
             {products.length < 1 && (
                 <div className='container-fluid'>Please wait....</div>
