@@ -48,19 +48,24 @@ export const Home = (props) => {
     const [category, setCategory]=useState('Electronic Devices');
 
     // getting products function
-    const getProducts = async ()=>{
-        const products = await fs.collection('Products').where('category','==',category).get();
-        const productsArray = [];
-        for (var snap of products.docs){
-            var data = snap.data();
-            data.ID = snap.id;
-            productsArray.push({
-                ...data
-            })
-            if(productsArray.length === products.docs.length){
-                setProducts(productsArray);
+    const getProducts = async ()=>{        
+        const products = await fs.collection('Products').where('category','==',category).get();        
+        const productsArray = [];        
+        if(products.docs.length>=1){
+            for (var snap of products.docs){
+                var data = snap.data();                                              
+                data.ID = snap.id;
+                productsArray.push({
+                    ...data
+                })
+                if(productsArray.length === products.docs.length){
+                    setProducts(productsArray);
+                }                                    
             }
         }
+        else{
+            setProducts([]);
+        }       
     }
 
     useEffect(()=>{
@@ -101,54 +106,49 @@ export const Home = (props) => {
         }
         
     }
-     
-    const handleCategory=(e)=>{
-        setCategory(e.currentTarget.id);
-        document.getElementById(category).classList.toggle('active');                     
+    const [spans]=useState([
+        {id: 'ElectronicDevices', text: 'Electronic Devices'},
+        {id: 'MobileAccessories', text: 'Mobile Accessories'},
+        {id: 'TVAndHomeAppliances', text: 'TV & Home Appliances'},
+        {id: 'SportsAndOutdoors', text: 'Sports & outdoors'},
+        {id: 'HealthAndBeauty', text: 'Health & Beauty'},
+        {id: 'HomeAndLifestyle', text: 'Home & Lifestyle'},
+        {id: 'MensFashion', text: `Men's Fashion`},
+        {id: 'WatchesBagsAndJewellery', text: `Watches, bags & Jewellery`},
+        {id: 'Groceries', text: 'Groceries'},             
+    ])
+    const [active, setActive]=useState('ElectronicDevices');    
+    const handleCategory=(individualSpan)=>{        
+        setCategory(individualSpan.text);
+        setActive(individualSpan.id);                              
     }
     
     return (
         <>
             <Navbar user={user} totalProducts={totalProducts}/>           
-            <br></br>
-            {products.length > 0 && (
-                <>
-                    <div className='container-fluid filter-products-main-box'>
-                        <div className='filter-box'>
-                            <h6>Filter by category</h6>                        
-                            <span onClick={handleCategory} 
-                            id="Electronic Devices" data-id="Electronic Devices">Electronic Devices</span>
-                            <span onClick={handleCategory}
-                            id="Mobile Accessories" data-id="Mobile Accessories">Mobile Accessories</span>
-                            <span onClick={handleCategory}
-                            id="TV & Home Appliances" data-id="TV & Home Appliances">TV & Home Appliances</span>
-                            <span onClick={handleCategory}
-                            id="Sports & outdoors" data-id="Sports & outdoors">Sports & outdoors</span>
-                            <span onClick={handleCategory}
-                            id="Health & Beauty" data-id="Health & Beauty">Health & Beauty</span>
-                            <span onClick={handleCategory}
-                            id="Home & Lifestyle" data-id="Home & Lifestyle">Home & Lifestyle</span>
-                            <span onClick={handleCategory}
-                            id="Men's Fashion" data-id="Men's Fashion">Men's Fashion</span>
-                            <span onClick={handleCategory}
-                            id="Watches, bags & Jewellery" data-id="Watches, bags & Jewellery">Watches, bags & Jewellery</span>
-                            <span onClick={handleCategory}
-                            id="Groceries" data-id="Groceries">Groceries</span>
-                        </div>                 
-                      
-                        <div className='my-products'>
-                            <h1 className='text-center'>{category}</h1>
-                            <div className='products-box'>
-                                <Products products={products} addToCart={addToCart}/>
-                            </div>
+            <br></br>            
+            
+            <div className='container-fluid filter-products-main-box'>
+                <div className='filter-box'>
+                    <h6>Filter by category</h6>                                                 
+                    {spans.map((individualSpan,index)=>(
+                        <span key={index} id={individualSpan.id}
+                        className={individualSpan.id===active ? active:'deactive'}
+                        onClick={()=>handleCategory(individualSpan)}>{individualSpan.text}</span>
+                    ))}
+                </div>                 
+                {products.length>0&&(
+                    <div className='my-products'>
+                        <h1 className='text-center'>{category}</h1>
+                        <div className='products-box'>
+                            <Products products={products} addToCart={addToCart}/>
                         </div>
-
-                    </div>                    
-                </>
-            )}
-            {products.length < 1 && (
-                <div className='container-fluid'>Please wait....</div>
-            )}
+                    </div>
+                )}
+                {products.length < 1 && (
+                    <div className='my-products please-wait'>No Products in this category</div>
+                )}               
+            </div>                              
         </>
     )
 }

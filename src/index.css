@@ -111,7 +111,7 @@
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 30px;  
+  margin-top: 20px;  
 }
 
 @media(max-width: 540px){
@@ -333,7 +333,11 @@
 
 .filter-products-main-box .my-products{
   flex: 3.3;
-  /* border: 1px solid green; */  
+  /* border: 1px solid green; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;  
 }
 
 @media(max-width: 540px){
@@ -371,6 +375,22 @@
   font-size: 14px;
 }
 
-.filter-box span.active{
+.filter-box span.ElectronicDevices{
+  color: #e00a02;
+}
+
+.filter-box span.MobileAccessories{
+  color: #e00a02;
+}
+
+.filter-box span.TVAndHomeAppliances{
+  color: #e00a02;
+}
+
+.filter-box span.SportsAndOutdoors{
+  color: #e00a02;
+}
+
+.HealthAndBeauty,.HomeAndLifestyle,.MensFashion,.WatchesBagsAndJewellery,.Groceries{
   color: #e00a02;
 }
