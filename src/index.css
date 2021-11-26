@@ -114,6 +114,11 @@
   margin-top: 20px;  
 }
 
+.products-box.cart{
+  height: auto;
+  overflow-y: auto;
+}
+
 @media(max-width: 540px){
   .products-box{
     height: auto;    

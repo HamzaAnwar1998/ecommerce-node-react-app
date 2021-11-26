@@ -2,6 +2,7 @@ import React,{useState, useEffect} from 'react'
 import { Navbar } from './Navbar'
 import { Products } from './Products'
 import {auth,fs} from '../Config/Config'
+import { IndividualFilteredProduct } from './IndividualFilteredProduct'
 
 export const Home = (props) => {
 
@@ -39,17 +40,38 @@ export const Home = (props) => {
     }
 
     const user = GetCurrentUser();
-    // console.log(user);
     
     // state of products
     const [products, setProducts]=useState([]);
-    
-    // state of category
-    const [category, setCategory]=useState('Electronic Devices');
 
     // getting products function
-    const getProducts = async ()=>{        
-        const products = await fs.collection('Products').where('category','==',category).get();        
+    // const getProducts = async ()=>{        
+    //     const products = await fs.collection('Products').where('category','==',category).get();        
+    //     const productsArray = [];        
+    //     if(products.docs.length>=1){
+    //         for (var snap of products.docs){
+    //             var data = snap.data();                                              
+    //             data.ID = snap.id;
+    //             productsArray.push({
+    //                 ...data
+    //             })
+    //             if(productsArray.length === products.docs.length){
+    //                 setProducts(productsArray);
+    //             }                                    
+    //         }
+    //     }
+    //     else{
+    //         setProducts([]);
+    //     }       
+    // }
+
+    // useEffect(()=>{
+    //     getProducts();
+    // },[category])
+
+    // getting products function
+    const getProducts = async ()=>{      
+        const products = await fs.collection('Products').get();        
         const productsArray = [];        
         if(products.docs.length>=1){
             for (var snap of products.docs){
@@ -70,7 +92,7 @@ export const Home = (props) => {
 
     useEffect(()=>{
         getProducts();
-    },[category])
+    },[])
 
     // state of totalProducts
     const [totalProducts, setTotalProducts]=useState(0);
@@ -92,7 +114,6 @@ export const Home = (props) => {
     // add to cart
     const addToCart = (product)=>{
         if(uid!==null){
-            // console.log(product);
             Product=product;
             Product['qty']=1;
             Product['TotalProductPrice']=Product.qty*Product.price;
@@ -106,6 +127,8 @@ export const Home = (props) => {
         }
         
     }
+
+    // categories list rendering using span tag
     const [spans]=useState([
         {id: 'ElectronicDevices', text: 'Electronic Devices'},
         {id: 'MobileAccessories', text: 'Mobile Accessories'},
@@ -117,12 +140,38 @@ export const Home = (props) => {
         {id: 'WatchesBagsAndJewellery', text: `Watches, bags & Jewellery`},
         {id: 'Groceries', text: 'Groceries'},             
     ])
-    const [active, setActive]=useState('ElectronicDevices');    
+
+    // active category class
+    const [active, setActive]=useState('ElectronicDevices');
+
+    // state of category
+    const [category, setCategory]=useState('Electronic Devices');
+    
+    // changing category and active class
     const handleCategory=(individualSpan)=>{        
         setCategory(individualSpan.text);
-        setActive(individualSpan.id);                              
+        setActive(individualSpan.id);                          
     }
-    
+
+    // state for filtered products
+    const [filteredProducts, setFilteredProducts]=useState([]); 
+
+    // filter function
+    const filterFunction=()=>{
+        if(products.length>1){
+            const filter=products.filter((product)=>product.category===category);
+            setFilteredProducts(filter);
+        }
+        else{
+            console.log('no products to filter')
+        } 
+    }
+
+    // triggering filter function
+    useEffect(()=>{
+        filterFunction();
+     },[])
+
     return (
         <>
             <Navbar user={user} totalProducts={totalProducts}/>           
@@ -137,17 +186,20 @@ export const Home = (props) => {
                         onClick={()=>handleCategory(individualSpan)}>{individualSpan.text}</span>
                     ))}
                 </div>                 
-                {products.length>0&&(
+                {filteredProducts.length>0&&(
                     <div className='my-products'>
                         <h1 className='text-center'>{category}</h1>
                         <div className='products-box'>
-                            <Products products={products} addToCart={addToCart}/>
+                            {filteredProducts.map(individualFilteredProduct=>(
+                            <IndividualFilteredProduct individualFilteredProduct={individualFilteredProduct}
+                                key={individualFilteredProduct.ID} addToCart={addToCart}/>
+                            ))}
                         </div>
                     </div>
                 )}
-                {products.length < 1 && (
-                    <div className='my-products please-wait'>No Products in this category</div>
-                )}               
+                {filteredProducts.length < 1&&(
+                    <div className='my-products please-wait'>Loading...</div>
+                )}
             </div>                              
         </>
     )
