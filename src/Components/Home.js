@@ -42,32 +42,7 @@ export const Home = (props) => {
     const user = GetCurrentUser();
     
     // state of products
-    const [products, setProducts]=useState([]);
-
-    // getting products function
-    // const getProducts = async ()=>{        
-    //     const products = await fs.collection('Products').where('category','==',category).get();        
-    //     const productsArray = [];        
-    //     if(products.docs.length>=1){
-    //         for (var snap of products.docs){
-    //             var data = snap.data();                                              
-    //             data.ID = snap.id;
-    //             productsArray.push({
-    //                 ...data
-    //             })
-    //             if(productsArray.length === products.docs.length){
-    //                 setProducts(productsArray);
-    //             }                                    
-    //         }
-    //     }
-    //     else{
-    //         setProducts([]);
-    //     }       
-    // }
-
-    // useEffect(()=>{
-    //     getProducts();
-    // },[category])
+    const [products, setProducts]=useState([]); 
 
     // getting products function
     const getProducts = async ()=>{      
@@ -142,42 +117,46 @@ export const Home = (props) => {
     ])
 
     // active category class
-    const [active, setActive]=useState('ElectronicDevices');
+    const [active, setActive]=useState('');
 
     // state of category
-    const [category, setCategory]=useState('Electronic Devices');
+    const [category, setCategory]=useState('');
     
     // changing category and active class
     const handleCategory=(individualSpan)=>{        
         setCategory(individualSpan.text);
-        setActive(individualSpan.id);                          
+        setActive(individualSpan.id);
+        filterFunction(individualSpan.text);                                
     }
 
     // state for filtered products
     const [filteredProducts, setFilteredProducts]=useState([]); 
 
     // filter function
-    const filterFunction=()=>{
+    const filterFunction=(text)=>{
         if(products.length>1){
-            const filter=products.filter((product)=>product.category===category);
+            const filter=products.filter((product)=>product.category===text);
             setFilteredProducts(filter);
         }
         else{
             console.log('no products to filter')
         } 
     }
-
-    // triggering filter function
-    useEffect(()=>{
-        filterFunction();
-     },[])
-
+    
+    // return to all products
+    const returntoAllProducts=()=>{
+        setFilteredProducts([]);
+        setCategory('');
+        setActive('');
+    }
+    
     return (
         <>
             <Navbar user={user} totalProducts={totalProducts}/>           
             <br></br>            
             
             <div className='container-fluid filter-products-main-box'>
+
                 <div className='filter-box'>
                     <h6>Filter by category</h6>                                                 
                     {spans.map((individualSpan,index)=>(
@@ -185,10 +164,12 @@ export const Home = (props) => {
                         className={individualSpan.id===active ? active:'deactive'}
                         onClick={()=>handleCategory(individualSpan)}>{individualSpan.text}</span>
                     ))}
-                </div>                 
+                </div>
+
                 {filteredProducts.length>0&&(
                     <div className='my-products'>
                         <h1 className='text-center'>{category}</h1>
+                        <a href="javascript:void(0)" onClick={returntoAllProducts}>Return to All Products</a>
                         <div className='products-box'>
                             {filteredProducts.map(individualFilteredProduct=>(
                             <IndividualFilteredProduct individualFilteredProduct={individualFilteredProduct}
@@ -197,9 +178,23 @@ export const Home = (props) => {
                         </div>
                     </div>
                 )}
+
                 {filteredProducts.length < 1&&(
-                    <div className='my-products please-wait'>Loading...</div>
-                )}
+                    <>
+                        {products.length > 0 && (
+                            <div className='my-products'>
+                                <h1 className='text-center'> Our Products</h1>
+                                <div className='products-box'>
+                                    <Products products={products} addToCart={addToCart}/>
+                                </div>
+                            </div>
+                        )}
+                        {products.length < 1 && (
+                            <div className='my-products please-wait'>Please wait....</div>
+                        )}
+                    </>                                              
+                )}                                           
+                                                          
             </div>                              
         </>
     )

@@ -6,7 +6,7 @@ export const AddProducts = () => {
     const [title, setTitle]=useState('');
     const [description, setDescription]=useState('');
     const [price, setPrice]=useState('');
-    const [category, setCategory]=useState('Select Product Category');
+    const [category, setCategory]=useState('');
     const [image, setImage]=useState(null);
 
     const [imageError, setImageError]=useState('');
@@ -52,7 +52,7 @@ export const AddProducts = () => {
                     setSuccessMsg('Product added successfully');
                     setTitle('');
                     setDescription('');
-                    setCategory('Select Product Category');
+                    setCategory('');
                     setPrice('');
                     document.getElementById('file').value='';
                     setImageError('');
@@ -90,8 +90,8 @@ export const AddProducts = () => {
                 <br></br>
                 <label>Product Category</label>
                 <select className='form-control' required
-                value={category} onChange={(e)=>setCategory(e.target.value)}>
-                    <option>Select Product Category</option>
+                value={category} onChange={(e)=>setCategory(e.target.value)}>                                    
+                    <option value="">Select Product Category</option>                   
                     <option>Electronic Devices</option>
                     <option>Mobile Accessories</option>
                     <option>TV & Home Appliances</option>
@@ -121,8 +121,7 @@ export const AddProducts = () => {
             </form>
             {uploadError&&<>
                     <br></br>
-                    <div className='error-msg'>{uploadError}</div>
-                    
+                    <div className='error-msg'>{uploadError}</div>                    
                 </>}
 
         </div>
